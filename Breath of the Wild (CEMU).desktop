@@ -1,0 +1,10 @@
+ #!/usr/bin/env xdg-open
+[Desktop Entry]
+Name=Breath of the Wild - CEMU 1.15.4
+Icon=BOTW1.png
+Path=/home/quentin/DATA_700/WINE_LIB/WINE_CEMU_1154_BOTW/drive_c/cemu_1.15.4
+Exec=bash -c 'env __GL_THREADED_OPTIMIZATIONS=1 WINEDEBUG=-all,+fps  WINEARCH=win64 WINEPREFIX=/home/quentin/DATA_700/WINE_LIB/WINE_CEMU_1154_BOTW WINEDLLOVERRIDES=dbghelp=n,b; wine Cemu.exe -g "Z:\home\quentin\DATA_700\WINE_LIB\cemugames\The Legend of Zelda Breath of the Wild (ALZP0101)\code\U-King.rpx"'
+Terminal=false
+Type=Application
+StartupNotify=true
+Keywords=Games;
