@@ -1,6 +1,6 @@
 # Maintainer: Quentin Bouvet <qbouvet at outlook dot com>
 pkgname="breath-of-the-wild-cemu"
-pkgver=0.0.1
+pkgver=208
 pkgrel=1
 pkgdesc="Wii U game"
 arch=('x86_64')
@@ -68,34 +68,64 @@ sleep 5
 
 function package() {
 
-    cd "${srcdir}"    
-    mkdir -p "${pkgdir}/usr/share/${pkgname}"
+    # 
+    #   Magic constants
+    #
+    TITLESTRING="00050000_101C9500"
+    RPXHASH="dcac9927"
 
-    # Extract archives directly to $srcdir  
-    #   -o: output directory
-    #   -ao: overwrite mode (a=all)
+    cd "${srcdir}"    
+
+    # Need separate directories for the base game, update files, and dlc files
+    # The install files eventually need to be mounted inside the CEMU installation files (?)
+    mkdir -p "${pkgdir}/usr/share/${pkgname}/basegame"
+    mkdir -p "${pkgdir}/usr/share/${pkgname}/mlc01/usr/title/$TITLESTRING/"
+    mkdir -p "${pkgdir}/usr/share/${pkgname}/mlc01/usr/title/$TITLESTRING/aoc"
+
+
+    # Extract base game
     7z x \
-      -o"${pkgdir}/usr/share/${pkgname}/" \
+      -o"${pkgdir}/usr/share/${pkgname}" \
       -ao'a' \
-      'Anomaly-1.5.1.7z'
+      'Breath of the Wild (ALZP0101).zip'
+    mv \
+      "${pkgdir}/usr/share/${pkgname}"/'Breath of the Wild (ALZP0101)'/* \
+      "${pkgdir}/usr/share/${pkgname}/basegame/"
+    # ^ This does not need to exist anywhere specific eventually
+
+    # Extract Updates
     7z x \
-      -o"${pkgdir}/usr/share/${pkgname}/" \
+      -o"${pkgdir}/usr/share/${pkgname}" \
       -ao'a' \
-      'Anomaly-1.5.1-to-1.5.2-Update.7z'
+      'Breath of the Wild (UPDATE DATA) (v208) (3.253 GB) (EUR) (unpacked).zip'
+    mv \
+      "${pkgdir}/usr/share/${pkgname}"/'Breath of the Wild (UPDATE DATA) (v208) (3.253 GB) (EUR) (unpacked)'/* \
+      "${pkgdir}/usr/share/${pkgname}/mlc01/usr/title/$TITLESTRING/"
+
+    # Extract DLC
+    7z x \
+      -o"${pkgdir}/usr/share/${pkgname}" \
+      -ao'a' \
+      'Breath of the Wild (DLC) (2.297 GB) (EUR) (unpacked).zip'
+    mv \
+      "${pkgdir}/usr/share/${pkgname}"/'Breath of the Wild (DLC) (2.297 GB) (EUR) (unpacked)'/* \
+      "${pkgdir}/usr/share/${pkgname}/mlc01/usr/title/$TITLESTRING/aoc"
+
+    # Cleanup now-empty directories
+    rmdir "${pkgdir}/usr/share/${pkgname}"/'Breath of the Wild (ALZP0101)'
+    rmdir "${pkgdir}/usr/share/${pkgname}"/'Breath of the Wild (UPDATE DATA) (v208) (3.253 GB) (EUR) (unpacked)'
+    rmdir "${pkgdir}/usr/share/${pkgname}"/'Breath of the Wild (DLC) (2.297 GB) (EUR) (unpacked)'
+
+    # Still missing: graphics packs
     
     #   Set permissions
     find "$pkgdir"/usr/share -type f -exec chmod 644 "{}" \;
     find "$pkgdir"/usr/share -type d -exec chmod 755 "{}" \;
     
     #   Install binary wrapper / Icon / Desktop files
-    install -m755 -D -t "${pkgdir}/usr/bin" \
-      "${pkgname}"
-    install -D -t "${pkgdir}/usr/share/icons/" \
-      "${pkgname}.png"
-    install -D -t "${pkgdir}/usr/share/applications/" \
-      "${pkgname}.desktop"
-    install -D -t "${pkgdir}/usr/share/applications/" \
-      "${pkgname}-launcher.desktop"
+    install -m755 -D -t "${pkgdir}/usr/bin"                 "${pkgname}"
+    install -D -t       "${pkgdir}/usr/share/icons/"        "${pkgname}.png"
+    install -D -t       "${pkgdir}/usr/share/applications/" "${pkgname}.desktop"
 }
 
 #

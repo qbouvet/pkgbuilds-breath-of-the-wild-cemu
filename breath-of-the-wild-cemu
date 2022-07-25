@@ -1,9 +1,195 @@
 #!/bin/bash
 
+# Usual bash flags
+set -euo pipefail       # Exit on 1/ nonzero exit code 2/ unassigned variable 3/ pipe error
+shopt -s nullglob       # Allow null globs
+shopt -s expand_aliases # Enable alias (not on by default in un-interactive shells)
+
+pkgname="breath-of-the-wild-cemu"
+
+WINE_ROOT="$HOME/.local/share/wineprefixes" # winetricks default
+GAMESAVES_ROOT="$HOME/Gamesaves"
+
+# wine prefix, no trailing /
+export WINEPREFIX="${WINE_ROOT}/${pkgname}"             
+# win32, win64
+export WINEARCH="win64"                                 
+# eg. "dbghelp=n,b";
+export WINEDLLOVERRIDES="mscoree=;mshtml=;d3d...=n;cemuhook.dll=n,b"
+# eg. -all -fps
+export WINEDEBUG=""                                     
+# Windows DLLs to be installed with winetricks
+winlibs="dxvk vcrun2015 corefonts "
+# win10, xp, ...
+winver="win10"                     
+
+
+#
+#   Magic constants
+#
+# Path inside cemu/mlc01/usr/title
+TITLESTRING="00050000/101C9500"
+# Path for the transferrable shader cache
+RPXHASH="dcac9927"
+# Not sure what these do
+COMMONKEYS=$(cat << EOF
+D7B00402659BA2ABD2CB0DB27FA2B656 # Zelda BOTW
+36262B5F49C69164E3BE2BB87C9922A7 # Zelda BOTW
+A851D78AB8F0A6FE1E93CFCEAF99A179 # Zelda BOTW
+D7B00402659BA2ABD2CB0DB27FA2B656 # Zelda BOTW
+36262B5F49C69164E3BE2BB87C9922A7 # Zelda BOTW
+A851D78AB8F0A6FE1E93CFCEAF99A179 # Zelda BOTW
+EOF
+)
+CEMUCONFIG=$(cat << EOF
+# TLoZ: Breath of the Wild (EUR)
+\n[General]
+useRDTSC= true
+\n[CPU] 
+cpuMode = TripleCore-Recompiler
+\n[Graphics]
+extendedTextureReadback = true
+disableGPUFence = false  
+    # Optional
+    # true -> standard behaviour
+    # min -> reduces RAM usage, artifacts, require deletion of shadercache/precompiled
+accurateShaderMul = min
+GPUBufferCacheAccuracy = 2\n
+EOF
+)
+
+
+
+#
+# Output to the console and notify-send if available
+#
+function notify () {
+    echo "$@"
+    if [[ -x $(which notify-send) ]] 
+    then 
+        notify-send --app-name=${pkgname} --icon=${pkgname} "$@"
+    fi 
+}
+
+
+#
+#   Delete the wine prefix
+#
+function resetWinePrefix() {
+
+    #notify "Unmounting UnionFS"
+    #umount ${WINEPREFIX}/drive_c/${pkgname}_union;
+
+    notify "Deleting Wine Prefix"
+    rm -rf ${WINEPREFIX}
+}
+
+
+#
+#   First time setup includes: 
+#     - Create a wineprefix with necessary libraries
+#     - Create the folder structure for unionFS
+#     - Copy over files that should be writable
+#     - Symlink directory for games saves
+#
+function initialSetup () {
+
+    notify "Performing 1st time setup (this may take some time)"
+
+    # Initialize prefix
+    mkdir -p "${WINEPREFIX}"
+    wineboot
+    winetricks sandbox
+    winetricks ${winver}
+    winetricks ${winlibs}
+
+    # Symlink read-only CEMU files
+    mkdir -p "${WINEPREFIX}/drive_c/program_files/cemu"
+    ln -s /usr/share/cemu/Cemu.exe     "${WINEPREFIX}/drive_c/program_files/cemu/Cemu.exe"
+    ln -s /usr/share/cemu/cemuhook.dll "${WINEPREFIX}/drive_c/program_files/cemu/cemuhook.dll"
+    ln -s /usr/share/cemu/keystone.dll "${WINEPREFIX}/drive_c/program_files/cemu/keystone.dll"
+    ln -s /usr/share/cemu/sharedFonts  "${WINEPREFIX}/drive_c/program_files/cemu/sharedFonts"
+
+    # Copy writable CEMU files 
+    cp -r /usr/share/cemu/gameProfiles "${WINEPREFIX}/drive_c/program_files/cemu" # Might be the save files
+    cp -r /usr/share/cemu/shaderCache  "${WINEPREFIX}/drive_c/program_files/cemu"
+
+    # This one I'm not sure
+    #cp -r /usr/share/cemu/mlc01 "$HOME"/.cemu/ || exit 1
+
+    # Symlink game files (base game needs no symlink, dlc is nested in updates)
+    mkdir -p "${WINEPREFIX}/drive_c/program_files/cemu/mlc01/usr/title/$TITLESTRING"
+    ln -s \
+        "/usr/share/${pkgname}/mlc01/usr/title/$TITLESTRING" \
+        "${WINEPREFIX}/drive_c/program_files/cemu/mlc01/usr/title/$TITLESTRING"
+
+    # Install common keys
+    #echo "$COMMONKEYS" > "${WINEPREFIX}/drive_c/program_files/cemu/keys.txt"
+
+    # Install config file 
+    #echo "$CONFIGFILE" > "${CEMUDIR}/gameProfiles/$(echo $TITLESTRING | sed 's:/::').ini"
+
+    # Still missing: graphics packs
+
+    # Mark successful
+    touch "${WINEPREFIX}/_success"
+}
+
+
+#
+#   Parse CLI arguments and start application accordingly
+#
+function main() {
+
+    if [ $# -ge 1 ] && [ "$1" == "--reset" ]; 
+    then 
+        echo "--reset"
+        resetWinePrefix
+        return 
+    fi
+
+    # First-time setup
+    if [ ! -d "${WINEPREFIX}/_success" ]; then
+        initialSetup
+    fi
+
+    setupUnionFs
+
+    notify "Starting Application with wine"
+
+    cd "${WINEPREFIX}/drive_c/${pkgname}_union"
+
+
+    cd "${WINEPREFIX}/drive_c/${pkgname}"
+    ENV="env \
+        __GL_THREADED_OPTIMIZATIONS=1 \
+        WINEDEBUG=-all,+fps  \
+        WINEARCH=win64 \
+        WINEPREFIX=${WINEPREFIX} \
+        WINEDLLOVERRIDES=dbghelp=n,b;\
+    "
+    OPTS="\
+        -g Z:\\usr\\share\\${pkgname}\\The Legend of Zelda Breath of the Wild (ALZP0101)\\code\\U-King.rpx
+    "
+    ${ENV} wine Cemu.exe ${OPTS}
+
+}
+
+
+main $@
+exit 0
+
+
+# -----------------------------------------------------------------------------
+
 # TODO: 
 #   - Initialize wine prefix
 #   - Initialize CEMU
 #   - Run app
+
+# We can copy / symlink / UnionFs our own copy of CEMU from the CEMU AUR package: 
+#   - https://aur.archlinux.org/cgit/aur.git/tree/cemu.sh?h=cemu
+#   - https://aur.archlinux.org/packages/cemu
 
 # -----------------------------------------------------------------------------
 

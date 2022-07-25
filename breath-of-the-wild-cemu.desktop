@@ -1,0 +1,9 @@
+ #!/usr/bin/env xdg-open
+[Desktop Entry]
+Name=Breath of the Wild (CEMU)
+Icon=breath-of-the-wild-cemu.png
+Exec=breath-of-the-wild-cemu
+Terminal=false
+Type=Application
+StartupNotify=true
+Keywords=Games;
