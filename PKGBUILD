@@ -71,7 +71,7 @@ function package() {
     # 
     #   Magic constants
     #
-    TITLESTRING="00050000_101C9500"
+    TITLESTRING="00050000/101C9500"
     RPXHASH="dcac9927"
 
     cd "${srcdir}"    

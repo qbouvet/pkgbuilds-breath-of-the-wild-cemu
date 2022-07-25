@@ -28,7 +28,8 @@ winver="win10"
 #   Magic constants
 #
 # Path inside cemu/mlc01/usr/title
-TITLESTRING="00050000/101C9500"
+TITLESTRING1="00050000"
+TITLESTRING2="101C9500"
 # Path for the transferrable shader cache
 RPXHASH="dcac9927"
 # Not sure what these do
@@ -76,10 +77,6 @@ function notify () {
 #   Delete the wine prefix
 #
 function resetWinePrefix() {
-
-    #notify "Unmounting UnionFS"
-    #umount ${WINEPREFIX}/drive_c/${pkgname}_union;
-
     notify "Deleting Wine Prefix"
     rm -rf ${WINEPREFIX}
 }
@@ -126,10 +123,10 @@ function initialSetup () {
     ln -s \
         "/usr/share/${pkgname}/basegame" \
         "${WINEPREFIX}/drive_c/${pkgname}/basegame"
-    mkdir -p "${WINEPREFIX}/drive_c/${pkgname}/mlc01/usr/title/$TITLESTRING"
+    mkdir -p "${WINEPREFIX}/drive_c/${pkgname}/mlc01/usr/title/$TITLESTRING1"
     ln -s \
-        "/usr/share/${pkgname}/mlc01/usr/title/$TITLESTRING" \
-        "${WINEPREFIX}/drive_c/${pkgname}/mlc01/usr/title/$TITLESTRING"
+        "/usr/share/${pkgname}/mlc01/usr/title/$TITLESTRING1/$TITLESTRING2" \
+        "${WINEPREFIX}/drive_c/${pkgname}/mlc01/usr/title/$TITLESTRING1/$TITLESTRING2"
 
     # Install common keys
     #echo "$COMMONKEYS" > "${WINEPREFIX}/drive_c/program_files/cemu/keys.txt"
@@ -176,7 +173,7 @@ function main() {
     fi
 
     notify "Starting Application with wine"
-    cd "${WINEPREFIX}/drive_c/${pkgname}"
+    pushd "${WINEPREFIX}/drive_c/${pkgname}"
 
     if [ $argument == "--cemu" ] 
     then 
@@ -187,6 +184,8 @@ function main() {
             Cemu.exe \
             -g 'C:\'"${pkgname}"'\basegame\code\U-King.rpx'
     fi
+
+    popd
 }
 
 
