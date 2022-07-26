@@ -1,0 +1,9 @@
+ #!/usr/bin/env xdg-open
+[Desktop Entry]
+Name=The legend of Zela - Breath of the Wild (CEMU)
+Icon=zelda-breath-of-the-wild-cemu.png
+Exec=zelda-breath-of-the-wild-cemu
+Terminal=false
+Type=Application
+StartupNotify=true
+Keywords=Games;

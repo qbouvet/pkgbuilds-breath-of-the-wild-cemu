@@ -1,7 +1,7 @@
 # Maintainer: Quentin Bouvet <qbouvet at outlook dot com>
-pkgname="breath-of-the-wild-cemu"
+pkgname="zelda-breath-of-the-wild-cemu"
 pkgver=208
-pkgrel=3
+pkgrel=4
 pkgdesc="Wii U game"
 arch=('x86_64')
 license=('none')
@@ -14,14 +14,12 @@ source=(
     "file://${pkgname}"
     "file://${pkgname}.png"
     "file://${pkgname}.desktop"
-    "file://controller-config-xbox1.txt"
     "manual://Breath of the Wild (ALZP0101).zip"
     "manual://Breath of the Wild (DLC) (2.297 GB) (EUR) (unpacked).zip"
     "manual://Breath of the Wild (UPDATE DATA) (v208) (3.253 GB) (EUR) (unpacked).zip"
     "https://github.com/ActualMandM/cemu_graphic_packs/releases/download/Github876/graphicPacks876.zip"
 )
 md5sums=(
-    "SKIP"
     "SKIP"
     "SKIP"
     "SKIP"
@@ -85,7 +83,6 @@ function package() {
     mkdir -p "${pkgdir}/usr/share/${pkgname}/mlc01/usr/title/$TITLESTRING/"
     mkdir -p "${pkgdir}/usr/share/${pkgname}/mlc01/usr/title/$TITLESTRING/aoc"
     mkdir -p "${pkgdir}/usr/share/${pkgname}/graphicPacks"
-    mkdir -p "${pkgdir}/usr/share/${pkgname}/controllerProfiles"
 
     # Extract base game
     7z x -ao'a' \
@@ -115,14 +112,6 @@ function package() {
     7z x -ao'a' \
       -o"${pkgdir}/usr/share/${pkgname}/graphicPacks" \
       'graphicPacks876.zip'
-
-    # Controller profile
-    cp \
-      controller-config-xbox1.txt \
-      "${pkgdir}/usr/share/${pkgname}/controllerProfiles/xbox1.txt"
-    ln -s \
-      "${pkgdir}/usr/share/${pkgname}/controllerProfiles/xbox1.txt" \
-      "${pkgdir}/usr/share/${pkgname}/controllerProfiles/controller0.txt"
 
     # Cleanup now-empty directories
     rmdir "${pkgdir}/usr/share/${pkgname}"/'Breath of the Wild (ALZP0101)'

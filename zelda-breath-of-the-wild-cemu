@@ -5,7 +5,7 @@ set -euo pipefail       # Exit on 1/ nonzero exit code 2/ unassigned variable 3/
 shopt -s nullglob       # Allow null globs
 shopt -s expand_aliases # Enable alias (not on by default in un-interactive shells)
 
-pkgname="breath-of-the-wild-cemu"
+pkgname="zelda-breath-of-the-wild-cemu"
 
 WINE_ROOT="$HOME/.local/share/wineprefixes" # winetricks default
 GAMESAVES_ROOT="$HOME/Gamesaves"
@@ -107,11 +107,6 @@ function initialSetup () {
     cp -r \
         "/usr/share/${pkgname}/graphicPacks/BreathOfTheWild" \
         "${WINEPREFIX}/drive_c/${pkgname}/graphicPacks/BreathOfTheWild"
-
-    # Copy RW controller profiles
-    cp -r \
-        "/usr/share/${pkgname}/controllerProfiles" \
-        "${WINEPREFIX}/drive_c/${pkgname}/controllerProfiles"
 
     # Install common keys
     #echo "$COMMONKEYS" > "${WINEPREFIX}/drive_c/program_files/cemu/keys.txt"

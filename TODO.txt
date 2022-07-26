@@ -1,3 +1,5 @@
+- Rename package to zelda-breath-of-the-wild-cemu
+
 wrapper:
 - Save files should be in ~/Gamesaves
 

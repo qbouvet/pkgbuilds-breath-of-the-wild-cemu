@@ -28,7 +28,7 @@ function post_remove() {
   echo " -> Cleaning user directories"
 
   shopt -s nullglob   # Allow null globs
-  for d in /home/*/.local/share/wineprefixes/breath-of-the-wild-cemu
+  for d in /home/*/.local/share/wineprefixes/zelda-breath-of-the-wild-cemu
   do 
     echo "     -> $d"; 
     rm -rf "$d"
