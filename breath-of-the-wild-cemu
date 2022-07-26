@@ -15,11 +15,11 @@ export WINEPREFIX="${WINE_ROOT}/${pkgname}"
 # win32, win64
 export WINEARCH="win64"                                 
 # eg. "dbghelp=n,b";
-export WINEDLLOVERRIDES="dbghelp=n,b;" #"mscoree=;mshtml=;d3d...=n;cemuhook.dll=n,b"
+export WINEDLLOVERRIDES="mscoree=;mshtml=;dbghelp=n,b;d3d...=n;cemuhook.dll=n,b"
 # eg. -all -fps
 export WINEDEBUG=""                                     
 # Windows DLLs to be installed with winetricks
-winlibs="vcrun2015 corefonts" #"dxvk vcrun2017 corefonts "
+winlibs="dxvk vcrun2017 corefonts" #"dxvk vcrun2017 corefonts "
 # win10, xp, ...
 winver="win10"                     
 

@@ -1,7 +1,5 @@
 wrapper:
 - Save files should be in ~/Gamesaves
-- Update wine dlls
-- dxvk
 
 ideas: 
 - Can we make something for the shader cache ?
