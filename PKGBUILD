@@ -1,7 +1,7 @@
 # Maintainer: Quentin Bouvet <qbouvet at outlook dot com>
 pkgname="breath-of-the-wild-cemu"
 pkgver=208
-pkgrel=2
+pkgrel=3
 pkgdesc="Wii U game"
 arch=('x86_64')
 license=('none')

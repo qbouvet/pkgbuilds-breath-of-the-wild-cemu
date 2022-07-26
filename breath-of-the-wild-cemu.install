@@ -1,11 +1,7 @@
 #
 #   Remove the wine prefixes created by our wrapper from user 
-#   home directories. This does not delete save files, which 
-#   are kept in ~/Gamesaves/anomaly
+#   home directories.
 #
-
-# See wrapper script
-WINEPREFIXES="/home/*/.local/share/wineprefixes/breath-of-the-wild-cemu" 
 
 #function pre_install() {
 #    echo "pre_install($@)"
@@ -32,7 +28,8 @@ function post_remove() {
   echo " -> Cleaning user directories"
 
   shopt -s nullglob   # Allow null globs
-  for d in "${WINEPREFIXES}"; do 
+  for d in /home/*/.local/share/wineprefixes/breath-of-the-wild-cemu
+  do 
     echo "     -> $d"; 
     rm -rf "$d"
   done
