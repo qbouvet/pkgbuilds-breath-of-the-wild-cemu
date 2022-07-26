@@ -1,0 +1,17 @@
+# TLoZ: Breath of the Wild (EUR)
+# cemudir/gameProfiles/<titlestring,concatenated>.ini
+
+[General]
+useRDTSC= true
+
+[CPU] 
+cpuMode = TripleCore-Recompiler
+
+[Graphics]
+extendedTextureReadback = true
+disableGPUFence = false  
+    # Optional
+    # true -> standard behaviour
+    # min -> reduces RAM usage, artifacts, require deletion of shadercache/precompiled
+accurateShaderMul = min
+GPUBufferCacheAccuracy = 2 

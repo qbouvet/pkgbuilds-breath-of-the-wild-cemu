@@ -14,6 +14,7 @@ source=(
     "file://${pkgname}"
     "file://${pkgname}.png"
     "file://${pkgname}.desktop"
+    "file://controller-config-xbox1.txt"
     "manual://Breath of the Wild (ALZP0101).zip"
     "manual://Breath of the Wild (DLC) (2.297 GB) (EUR) (unpacked).zip"
     "manual://Breath of the Wild (UPDATE DATA) (v208) (3.253 GB) (EUR) (unpacked).zip"
@@ -24,6 +25,7 @@ md5sums=(
     "SKIP"
     "SKIP"
     "SKIP"
+    "SKIP" #?
     "SKIP" #47bbbefc8c68b6230de60ff84a90b26e
     "SKIP" #53e72865048b98404c96dfcba6179962
     "SKIP" #21f45373dec93707d6d6ca3b4bdd86fe
@@ -73,8 +75,8 @@ function package() {
     # 
     #   Magic constants
     #
-    TITLESTRING="00050000/101C9500"
-    RPXHASH="dcac9927"
+    TITLESTRING="00050000/101C9500" # Path inside cemu/mlc01/usr/title for updates / dlc path 
+    RPXHASH="dcac9927"              # For transferrable shaders path
 
     cd "${srcdir}"    
 
@@ -83,6 +85,7 @@ function package() {
     mkdir -p "${pkgdir}/usr/share/${pkgname}/mlc01/usr/title/$TITLESTRING/"
     mkdir -p "${pkgdir}/usr/share/${pkgname}/mlc01/usr/title/$TITLESTRING/aoc"
     mkdir -p "${pkgdir}/usr/share/${pkgname}/graphicPacks"
+    mkdir -p "${pkgdir}/usr/share/${pkgname}/controllerProfiles"
 
     # Extract base game
     7z x -ao'a' \
@@ -112,6 +115,14 @@ function package() {
     7z x -ao'a' \
       -o"${pkgdir}/usr/share/${pkgname}/graphicPacks" \
       'graphicPacks876.zip'
+
+    # Controller profile
+    cp \
+      controller-config-xbox1.txt \
+      "${pkgdir}/usr/share/${pkgname}/controllerProfiles/xbox1.txt"
+    ln -s \
+      "${pkgdir}/usr/share/${pkgname}/controllerProfiles/xbox1.txt" \
+      "${pkgdir}/usr/share/${pkgname}/controllerProfiles/controller0.txt"
 
     # Cleanup now-empty directories
     rmdir "${pkgdir}/usr/share/${pkgname}"/'Breath of the Wild (ALZP0101)'

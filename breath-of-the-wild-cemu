@@ -27,38 +27,9 @@ winver="win10"
 #
 #   Magic constants
 #
-# Path inside cemu/mlc01/usr/title
-TITLESTRING1="00050000"
+TITLESTRING1="00050000"  # Path inside cemu/mlc01/usr/title
 TITLESTRING2="101C9500"
-# Path for the transferrable shader cache
-RPXHASH="dcac9927"
-# Not sure what these do
-COMMONKEYS=$(cat << EOF
-D7B00402659BA2ABD2CB0DB27FA2B656 # Zelda BOTW
-36262B5F49C69164E3BE2BB87C9922A7 # Zelda BOTW
-A851D78AB8F0A6FE1E93CFCEAF99A179 # Zelda BOTW
-D7B00402659BA2ABD2CB0DB27FA2B656 # Zelda BOTW
-36262B5F49C69164E3BE2BB87C9922A7 # Zelda BOTW
-A851D78AB8F0A6FE1E93CFCEAF99A179 # Zelda BOTW
-EOF
-)
-CEMUCONFIG=$(cat << EOF
-# TLoZ: Breath of the Wild (EUR)
-\n[General]
-useRDTSC= true
-\n[CPU] 
-cpuMode = TripleCore-Recompiler
-\n[Graphics]
-extendedTextureReadback = true
-disableGPUFence = false  
-    # Optional
-    # true -> standard behaviour
-    # min -> reduces RAM usage, artifacts, require deletion of shadercache/precompiled
-accurateShaderMul = min
-GPUBufferCacheAccuracy = 2\n
-EOF
-)
-
+RPXHASH="dcac9927"       # Path for the transferrable shader cache
 
 
 #
@@ -93,6 +64,12 @@ function initialSetup () {
 
     notify "Performing 1st time setup (this may take some time)"
 
+    # Cleanup existing stuff
+    if [ -d "${WINEPREFIX}" ] 
+    then 
+        resetWinePrefix
+    fi
+
     # Initialize prefix
     mkdir -p "${WINEPREFIX}"
     wineboot
@@ -100,7 +77,7 @@ function initialSetup () {
     winetricks ${winver}
     winetricks ${winlibs}
 
-    # Symlink read-only CEMU files
+    # Symlink RO CEMU files
     mkdir -p "${WINEPREFIX}/drive_c/${pkgname}/"
     ln -s /usr/share/cemu/Cemu.exe     "${WINEPREFIX}/drive_c/${pkgname}/Cemu.exe"
     ln -s /usr/share/cemu/cemuhook.dll "${WINEPREFIX}/drive_c/${pkgname}/cemuhook.dll"
@@ -112,11 +89,11 @@ function initialSetup () {
         rm "${WINEPREFIX}/drive_c/${pkgname}/dbghelp.dll"
     fi
 
-    # Copy writable CEMU files 
+    # Copy RW CEMU files 
     cp -r /usr/share/cemu/gameProfiles "${WINEPREFIX}/drive_c/${pkgname}" # Might be the save files
     cp -r /usr/share/cemu/shaderCache  "${WINEPREFIX}/drive_c/${pkgname}"
 
-    # Symlink game files 
+    # Symlink RO game files 
     ln -s \
         "/usr/share/${pkgname}/basegame" \
         "${WINEPREFIX}/drive_c/${pkgname}/basegame"
@@ -125,8 +102,16 @@ function initialSetup () {
         "/usr/share/${pkgname}/mlc01/usr/title/$TITLESTRING1/$TITLESTRING2" \
         "${WINEPREFIX}/drive_c/${pkgname}/mlc01/usr/title/$TITLESTRING1/$TITLESTRING2"
 
-    # Symlink graphic packs
-    ln -s /usr/share/cemu/graphicPacks  "${WINEPREFIX}/drive_c/${pkgname}/graphicPacks"
+    # Copy RW graphic packs
+    mkdir -p "${WINEPREFIX}/drive_c/${pkgname}/graphicPacks"
+    cp -r \
+        "/usr/share/${pkgname}/graphicPacks/BreathOfTheWild" \
+        "${WINEPREFIX}/drive_c/${pkgname}/graphicPacks/BreathOfTheWild"
+
+    # Copy RW controller profiles
+    cp -r \
+        "/usr/share/${pkgname}/controllerProfiles" \
+        "${WINEPREFIX}/drive_c/${pkgname}/controllerProfiles"
 
     # Install common keys
     #echo "$COMMONKEYS" > "${WINEPREFIX}/drive_c/program_files/cemu/keys.txt"
@@ -177,9 +162,11 @@ function main() {
 
     if [ $argument == "--cemu" ] 
     then 
+        echo "--cemu"
         wine Cemu.exe
     elif [ $argument == "--game" ]
     then
+        echo "--game"
         __GL_THREADED_OPTIMIZATIONS=1 R600_DEBUG="nohyperz" wine \
             Cemu.exe \
             -g 'C:\'"${pkgname}"'\basegame\code\U-King.rpx'

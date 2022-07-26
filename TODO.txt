@@ -1,13 +1,8 @@
-PKGBUILD: 
-- Graphics pack
-- Controller configuration files
-
 wrapper:
-- Graphics pack
-- Controller configuration files
-- Check if we need common keys
-- Check if we need the configuration file
+- Save files should be in ~/Gamesaves
 - Update wine dlls
+- dxvk
 
 ideas: 
 - Can we make something for the shader cache ?
+- Graphics pack as a split package ?

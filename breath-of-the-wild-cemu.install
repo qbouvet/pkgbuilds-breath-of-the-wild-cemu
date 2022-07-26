@@ -7,25 +7,25 @@
 # See wrapper script
 WINEPREFIXES="/home/*/.local/share/wineprefixes/breath-of-the-wild-cemu" 
 
-function pre_install() {
-    echo "pre_install($@)"
-}
+#function pre_install() {
+#    echo "pre_install($@)"
+#}
 
-function post_install() {
-    echo "post_install($@)"
-}
+#function post_install() {
+#    echo "post_install($@)"
+#}
 
-function pre_upgrade() {
-    echo "pre_upgrade($@)"
-}
+#function pre_upgrade() {
+#    echo "pre_upgrade($@)"
+#}
 
-function post_upgrade () {
-    echo "post_upgrade($@)"
-}
+#function post_upgrade () {
+#    echo "post_upgrade($@)"
+#}
 
-function pre_remove() {
-    echo "pre_remove($@)"
-}
+#function pre_remove() {
+#    echo "pre_remove($@)"
+#}
 
 function post_remove() {
   
