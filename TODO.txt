@@ -1,0 +1,13 @@
+PKGBUILD: 
+- Graphics pack
+- Controller configuration files
+
+wrapper:
+- Graphics pack
+- Controller configuration files
+- Check if we need common keys
+- Check if we need the configuration file
+- Update wine dlls
+
+ideas: 
+- Can we make something for the shader cache ?

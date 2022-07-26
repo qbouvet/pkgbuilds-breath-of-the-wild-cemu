@@ -116,9 +116,6 @@ function initialSetup () {
     cp -r /usr/share/cemu/gameProfiles "${WINEPREFIX}/drive_c/${pkgname}" # Might be the save files
     cp -r /usr/share/cemu/shaderCache  "${WINEPREFIX}/drive_c/${pkgname}"
 
-    # This one I'm not sure
-    #cp -r /usr/share/cemu/mlc01 "$HOME"/.cemu/ || exit 1
-
     # Symlink game files 
     ln -s \
         "/usr/share/${pkgname}/basegame" \
@@ -127,6 +124,9 @@ function initialSetup () {
     ln -s \
         "/usr/share/${pkgname}/mlc01/usr/title/$TITLESTRING1/$TITLESTRING2" \
         "${WINEPREFIX}/drive_c/${pkgname}/mlc01/usr/title/$TITLESTRING1/$TITLESTRING2"
+
+    # Symlink graphic packs
+    ln -s /usr/share/cemu/graphicPacks  "${WINEPREFIX}/drive_c/${pkgname}/graphicPacks"
 
     # Install common keys
     #echo "$COMMONKEYS" > "${WINEPREFIX}/drive_c/program_files/cemu/keys.txt"
@@ -189,5 +189,5 @@ function main() {
 }
 
 
-main 
+main $@
 

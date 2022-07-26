@@ -1,7 +1,7 @@
 # Maintainer: Quentin Bouvet <qbouvet at outlook dot com>
 pkgname="breath-of-the-wild-cemu"
 pkgver=208
-pkgrel=1
+pkgrel=2
 pkgdesc="Wii U game"
 arch=('x86_64')
 license=('none')
@@ -17,7 +17,7 @@ source=(
     "manual://Breath of the Wild (ALZP0101).zip"
     "manual://Breath of the Wild (DLC) (2.297 GB) (EUR) (unpacked).zip"
     "manual://Breath of the Wild (UPDATE DATA) (v208) (3.253 GB) (EUR) (unpacked).zip"
-    # + graphics pack
+    "https://github.com/ActualMandM/cemu_graphic_packs/releases/download/Github876/graphicPacks876.zip"
 )
 md5sums=(
     "SKIP"
@@ -26,11 +26,13 @@ md5sums=(
     "SKIP"
     "SKIP" #47bbbefc8c68b6230de60ff84a90b26e
     "SKIP" #53e72865048b98404c96dfcba6179962
+    "SKIP" #21f45373dec93707d6d6ca3b4bdd86fe
 )
 noextract=(
     "Breath of the Wild (ALZP0101).zip"
     "Breath of the Wild (DLC) (2.297 GB) (EUR) (unpacked).zip"
     "Breath of the Wild (UPDATE DATA) (v208) (3.253 GB) (EUR) (unpacked).zip"
+    "graphicPacks876.zip"
 )
 install="${pkgname}.install"
 
@@ -76,47 +78,45 @@ function package() {
 
     cd "${srcdir}"    
 
-    # Need separate directories for the base game, update files, and dlc files
-    # The install files eventually need to be mounted inside the CEMU installation files (?)
+    # Need separate directories for the base game, update files, dlc files, graphic packs
     mkdir -p "${pkgdir}/usr/share/${pkgname}/basegame"
     mkdir -p "${pkgdir}/usr/share/${pkgname}/mlc01/usr/title/$TITLESTRING/"
     mkdir -p "${pkgdir}/usr/share/${pkgname}/mlc01/usr/title/$TITLESTRING/aoc"
-
+    mkdir -p "${pkgdir}/usr/share/${pkgname}/graphicPacks"
 
     # Extract base game
-    7z x \
+    7z x -ao'a' \
       -o"${pkgdir}/usr/share/${pkgname}" \
-      -ao'a' \
       'Breath of the Wild (ALZP0101).zip'
     mv \
       "${pkgdir}/usr/share/${pkgname}"/'Breath of the Wild (ALZP0101)'/* \
       "${pkgdir}/usr/share/${pkgname}/basegame/"
-    # ^ This does not need to exist anywhere specific eventually
 
     # Extract Updates
-    7z x \
+    7z x -ao'a' \
       -o"${pkgdir}/usr/share/${pkgname}" \
-      -ao'a' \
       'Breath of the Wild (UPDATE DATA) (v208) (3.253 GB) (EUR) (unpacked).zip'
     mv \
       "${pkgdir}/usr/share/${pkgname}"/'Breath of the Wild (UPDATE DATA) (v208) (3.253 GB) (EUR) (unpacked)'/* \
       "${pkgdir}/usr/share/${pkgname}/mlc01/usr/title/$TITLESTRING/"
 
     # Extract DLC
-    7z x \
+    7z x -ao'a' \
       -o"${pkgdir}/usr/share/${pkgname}" \
-      -ao'a' \
       'Breath of the Wild (DLC) (2.297 GB) (EUR) (unpacked).zip'
     mv \
       "${pkgdir}/usr/share/${pkgname}"/'Breath of the Wild (DLC) (2.297 GB) (EUR) (unpacked)'/* \
       "${pkgdir}/usr/share/${pkgname}/mlc01/usr/title/$TITLESTRING/aoc"
 
+    # Extract graphic packs
+    7z x -ao'a' \
+      -o"${pkgdir}/usr/share/${pkgname}/graphicPacks" \
+      'graphicPacks876.zip'
+
     # Cleanup now-empty directories
     rmdir "${pkgdir}/usr/share/${pkgname}"/'Breath of the Wild (ALZP0101)'
     rmdir "${pkgdir}/usr/share/${pkgname}"/'Breath of the Wild (UPDATE DATA) (v208) (3.253 GB) (EUR) (unpacked)'
     rmdir "${pkgdir}/usr/share/${pkgname}"/'Breath of the Wild (DLC) (2.297 GB) (EUR) (unpacked)'
-
-    # Still missing: graphics packs
     
     #   Set permissions
     find "$pkgdir"/usr/share -type f -exec chmod 644 "{}" \;
